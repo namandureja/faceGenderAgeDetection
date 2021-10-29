@@ -7,23 +7,236 @@
   <title>Document</title>
   <script defer src="face-api.js"></script>
   <script defer src="script.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Open Sans', sans-serif;
+      box-sizing: border-box;
+
     }
 
-    canvas {
+    h1{
+      font-size: 2.4vw;
+    }
+
+    canvas{
+      top: 0;
       position: absolute;
     }
+    p{
+      text-align: center;
+      padding: 0 15px;
+      font-size: 1.3vw;
+    }
+    a{
+      text-decoration: none;
+
+    }
+
+    .menu-item{
+      box-shadow: 0px 0px 11px -4px rgb(0 0 0 / 33%);
+      margin: 0 10px;
+      cursor: pointer;
+      font-weight: 400;
+      border-radius: 12px;
+      font-size: 1.2vw;
+      padding: 5px 17px;
+    }
+
+    .menu {
+      padding-top: 4px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .menu-item:hover{
+      color: #6e6e6e;
+    }
+
+    .selected{
+      background-color: black;
+      color: white;
+      opacity: 0.8;
+    }
+
+    .selected:hover{
+      color: white;
+    }
+   
+
+    .img-label{
+      display: flex;
+      justify-content: center;
+      padding-top: 30px;
+      flex-direction: column;
+      align-items: center;
+      
+    }
+  
+    .upload-label{
+      
+      display: flex;
+      align-items: center;
+      background-color: #f3f3f3;
+      padding: 6px 12px;
+      border-radius: 10px;
+      border-style: dashed;
+      border-width: 1px;
+      
+      border-color: #6e6e6e;
+    }
+
+    .disabled{
+      pointer-events: none;
+    }
+
+    .canvas{
+      position: relative;
+      display: flex;
+    }
+
+    .holder{
+      display: flex;
+      justify-content: center;
+      padding-top: 10px;
+    }
+
+    .video-section{
+      display: none;
+    }
+
+    .loader {
+      width: 30px;
+      height: 2.5px;
+      opacity: 1;
+      background-color: #08042e;
+      animation: load 1s linear infinite alternate-reverse;
+    }
+
+    .loader-white{
+      width: 30px;
+      height: 2.5px;
+      position: absolute;
+      top: 0px;
+    
+      animation: load-2 1s linear infinite alternate-reverse;
+
+      background-color: white;
+    }
+    .loader-wrapper{
+      width: 80px;
+      margin-top: 5px;
+      transition: all 2s;
+      position: relative;
+
+    }
+
+    .hidden{
+      display: none;
+    }
+
+    .disappear{
+      visibility: hidden;
+      opacity: 0;
+    }
+
+    .video-section{
+      margin-top: 15px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+ 
+
+@keyframes load {
+  0% { width: 0px;      
+  }
+  100% { width: 80px; }
+}
+
+@keyframes load-2 {
+  0% { width: 0px;      
+  }
+  35%{
+    width: 0px;
+  }
+  100% { width: 80px; }
+}
   </style>
 </head>
 <body>
-  <video id="video" width="720" height="560" autoplay muted></video>
+
+  <h1 style="text-align: center;">Face Detection</h1>
+  <p>
+    This application uses a <a href="https://github.com/justadudewhohacks/face-api.js" target="_blank">face detection api</a> and displays the probable age, gender, and emotions of the subject. You can upload an image or directly stream through your webcam.
+  </p>
+  <div class="menu">
+   <a class="img menu-item selected" id="img">Image</a>
+   <a class="video menu-item" id="vid">WebCam</a>
+
+  </div>
+
+  <input type="file"  accept="image/*" name="image" id="file"  onchange="loadFile(event)" style="display: none;" >
+  <div class="image-section">
+  <div class="img-label">
+  <label class="upload-label disabled" id="upld" for="file" style="cursor: pointer; color: #08042e;">
+    <i class="far fa-image" style="font-size:20px; margin-right: 5px;"></i>
+    Select File
+  </label>
+  <div class="loader-wrapper disappear">
+    <div class="loader"></div>
+    <div class="loader-white"></div>
+  </div>
+</div>
+<div class="holder">
+  <div class="canvas">
+  <img id="output" height="400" />
+  </div>
+</div>
+</div>
+<div class="video-section">
+  <video id="video" width="514" height="400" autoplay muted></video>
+</div>
+
+<script>
+ 
+  var currentID="img";
+  document.querySelector('.menu').addEventListener('click',(e)=>{
+      if(e.target!=document.querySelector('.menu'))
+        if(document.querySelector('.selected')!=e.target){
+          currentID=e.target.id;
+          document.querySelector('.selected').classList.remove("selected")
+          e.target.classList.add('selected');
+        }
+  });
+  document.querySelector('.video').addEventListener('click',()=>{
+
+    document.querySelector('.image-section').style.display='none';
+    document.querySelector('.video-section').style.display='flex';
+    if(currentID!='vid')
+    startVideo();
+
+  })
+  document.querySelector('.img').addEventListener('click',()=>{
+    document.querySelector('.image-section').style.display='block';
+    document.querySelector('.video-section').style.display='none';
+    localStream.getTracks().forEach(function(track) {
+  track.stop();
+});
+vid
+clearInterval(intervalID);
+vidCanvas.remove();
+video.srcObject=null;
+
+
+
+  })
+
+</script>
 </body>
 </html>
