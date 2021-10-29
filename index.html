@@ -138,6 +138,7 @@
 
     .hidden{
       display: none;
+      opacity: 0;
     }
 
     .disappear{
@@ -148,8 +149,15 @@
     .video-section{
       margin-top: 15px;
       position: relative;
-      display: none;
+      display: flex;
       justify-content: center;
+    }
+
+    .model-load{
+      font-size: 1.2vw;
+      margin-top: 5px;
+      transition: all 1.6s;
+      text-align: center;
     }
  
 
@@ -188,10 +196,13 @@
     <i class="far fa-image" style="font-size:20px; margin-right: 5px;"></i>
     Select File
   </label>
-  <div class="loader-wrapper disappear">
+  <div class="loader-wrapper">
     <div class="loader"></div>
     <div class="loader-white"></div>
   </div>
+  <p class="model-load">
+    Loading models..
+  </p>
 </div>
 <div class="holder">
   <div class="canvas">
@@ -199,7 +210,7 @@
   </div>
 </div>
 </div>
-<div class="video-section">
+<div class="video-section hidden">
   <video id="video" width="514" height="400" autoplay muted></video>
 </div>
 
@@ -216,15 +227,15 @@
   });
   document.querySelector('.video').addEventListener('click',()=>{
 
-    document.querySelector('.image-section').style.display='none';
-    document.querySelector('.video-section').style.display='flex';
+    document.querySelector('.image-section').classList.add('hidden');
+    document.querySelector('.video-section').classList.remove('hidden');
     if(currentID!='vid')
     startVideo();
 
   })
   document.querySelector('.img').addEventListener('click',()=>{
-    document.querySelector('.image-section').style.display='block';
-    document.querySelector('.video-section').style.display='none';
+    document.querySelector('.image-section').classList.remove('hidden');
+    document.querySelector('.video-section').classList.add('hidden');
     localStream.getTracks().forEach(function(track) {
   track.stop();
 });

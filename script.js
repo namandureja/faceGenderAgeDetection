@@ -48,6 +48,10 @@ function startAi() {
 function loaded() {
     console.log('models loaded')
     document.querySelector('.upload-label').classList.remove('disabled');
+    document.querySelector('.model-load').classList.add('hidden');
+    loader.classList.add('disappear');
+
+
 }
 
 async function startRecognition() {
